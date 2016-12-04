@@ -1,0 +1,91 @@
+apply plugin: 'com.android.application'
+Properties properties = new Properties()
+properties.load(new FileInputStream(file("../keystore/keystore.properties")))
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
+    defaultConfig {
+        applicationId "com.alex.besselview"
+        minSdkVersion 16
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude '!META-INF/MANIFEST.MF'
+        exclude 'META-INF/MANIFEST.MF'
+    }
+
+    /*多渠道 打包 -------- 第 1 步*/
+    productFlavors {
+        /*文件 名称*/
+        QG_101_baidu {
+            /*渠道号*/
+            manifestPlaceholders = [META_CHANNEL_VALUE: "QG_101"]
+        }
+        QG_102_91 {
+            manifestPlaceholders = [META_CHANNEL_VALUE: "QG_102"]
+        }
+        QG_103_wandoujia {
+            manifestPlaceholders = [META_CHANNEL_VALUE: "QG_103"]
+        }
+        QG_104_xiaomi {
+            manifestPlaceholders = [META_CHANNEL_VALUE: "QG_104"]
+        }
+    }
+
+    /*配置 签名工具   -------- 第 2 步 */
+    signingConfigs {
+        release {
+            storeFile file(properties['STORE_FILE'])
+            storePassword properties['STORE_PASSWORD']
+            keyAlias properties['KEY_ALIAS']
+            keyPassword properties['KEY_PASSWORD']
+        }
+    }
+
+    /*调整 输出 文件名   -------- 第 3 步*/
+    buildTypes {
+        release {
+            /*不显示Log*/
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+            /*开启混淆*/
+            minifyEnabled false
+            /*Zipalign优化*/
+            zipAlignEnabled true
+            /*移除无用的resource文件*/
+            shrinkResources false
+            /*前一部分代表系统默认的android程序的混淆文件，该文件已经包含了基本的混淆声明，指定混淆规则文件*/
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            /*修改输出文件的名称*/
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                        // 输出apk名称为dt_android360_v1.0_0705114322.apk
+                        def fileName = outputFile.name.replace("-release.apk", "-${defaultConfig.versionName}.apk")
+                        output.outputFile = new File(outputFile.parent, fileName)
+                    }
+                }
+            }
+        }
+    }
+
+
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile project(':besselview')
+}

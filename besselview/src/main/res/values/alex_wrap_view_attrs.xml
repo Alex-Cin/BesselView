@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="WrapView">
+        <attr name="wv_text" format="string" />
+        <attr name="wv_textSize" format="dimension" />
+        <attr name="wv_textColor" format="color" />
+        <attr name="wv_backgroundColor" format="color" />
+        <attr name="wv_paddingRadius" format="dimension" />
+        <attr name="wv_paddingV" format="dimension" />
+        <attr name="wv_paddingH" format="dimension" />
+        <attr name="wv_shape">
+            <flag name="oval" value="0" />
+            <flag name="rectangle" value="1" />
+        </attr>
+        <attr name="wv_dismissBoomResId" format="reference" />
+    </declare-styleable>
+</resources>
